@@ -21,7 +21,11 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path('', include('processor.urls')),
-    path('docs/openapi/', SpectacularAPIView.as_view(), name='openapi-schema'),
-    path('docs/', SpectacularSwaggerView.as_view(url_name='openapi-schema'), name='swagger-ui'),
-    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('docs/openapi/', SpectacularAPIView.as_view(), name='openapi-schema'),
+        path('docs/', SpectacularSwaggerView.as_view(url_name='openapi-schema'), name='swagger-ui'),
+        static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+    ]

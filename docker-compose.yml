@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: 'file_uploader_redis'
+    command: redis-server
+    ports:
+      - '6379:6379'
+    volumes:
+      - file_uploader:/data
+
+
+  web:
+    build: .
+    restart: unless-stopped
+    container_name: 'file_uploader_django'
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - '8000:8000'
+    environment:
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - file_uploader:/app
+
+  celery:
+    build: .
+    restart: unless-stopped
+    container_name: 'file_uploader_celery'
+    command: celery -A file_uploader worker -l INFO -B
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - web
+      - redis
+    volumes:
+      - file_uploader:/app
+
+volumes:
+  file_uploader:
