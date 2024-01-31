@@ -15,7 +15,7 @@ services:
     build: .
     restart: unless-stopped
     container_name: 'file_uploader_django'
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn file_uploader.wsgi:application -b 0.0.0.0:8000
     ports:
       - '8000:8000'
     environment:
@@ -43,6 +43,18 @@ services:
       - '5555:5555'
     depends_on:
       - redis
+
+  nginx:
+    image: nginx
+    hostname: nginx
+    ports:
+      - '80:8000'
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./file_uploader/static:/www/static
+      - ./file_uploader/media:/www/media
+    depends_on:
+      - web
 
 volumes:
   file_uploader:
