@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from .models import File
 from .serializers import FileSerializer
+from .tasks import process_file
 
 
 class FileListView(ListAPIView):
@@ -20,6 +21,7 @@ class FileUploadView(APIView):
     def post(self, request):
         upload = self.serializer_class(data=request.data)
         if upload.is_valid():
-            upload.save()
+            uploaded = upload.save()
+            process_file.delay(pk=uploaded.pk)
             return Response(upload.data, status=status.HTTP_201_CREATED)
         return Response(upload.errors, status=status.HTTP_400_BAD_REQUEST)
