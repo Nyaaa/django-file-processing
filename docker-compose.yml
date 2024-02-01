@@ -19,8 +19,6 @@ services:
     restart: unless-stopped
     container_name: 'file_uploader_redis'
     command: redis-server
-    ports:
-      - '6379:6379'
     volumes:
       - file_uploader:/data
 
@@ -29,8 +27,6 @@ services:
     restart: unless-stopped
     container_name: 'file_uploader_django'
     command: gunicorn file_uploader.wsgi:application -b 0.0.0.0:8000
-    ports:
-      - '8000:8000'
     environment:
       - REDIS_URL=redis://redis:6379
     depends_on:
