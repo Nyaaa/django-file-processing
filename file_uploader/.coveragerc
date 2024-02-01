@@ -1,0 +1,10 @@
+[run]
+branch = True
+omit =
+  */tests/*
+  */migrations/*
+  file_uploader/*
+  manage.py
+
+[report]
+skip_covered = true

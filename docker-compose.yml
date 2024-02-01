@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+  postgres:
+    container_name: 'file_uploader_postgres'
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-processor}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+    restart: unless-stopped
+
   redis:
     image: redis:latest
     restart: unless-stopped
@@ -20,6 +33,8 @@ services:
       - '8000:8000'
     environment:
       - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
     volumes:
       - ./file_uploader/:/app
 
@@ -55,6 +70,8 @@ services:
       - ./file_uploader/media:/www/media
     depends_on:
       - web
+      - postgres
 
 volumes:
   file_uploader:
+  postgres:
